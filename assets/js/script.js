@@ -23,12 +23,17 @@ const tareas = [
     {
         id: 5,
         task: "peinar la muñeca",
-        estado: false
+        estado: true
     }
 
 ];
 
 
+/*****************************************************************
+ * 
+ * FUNCION QUE CREA EL HTML DE LA TABLA, CON LOS DATOS DE LA LISTA DE OBJETOS
+ * 
+ ****************************************************************/
 function llenaTabla() {
     const listaTareas = document.getElementById("miTabla");
     const taskTotales = document.getElementById("txtTaskTotales");
@@ -51,90 +56,90 @@ function llenaTabla() {
     for (const tarea of tareas) {
         tabla +=
             `<tbody >
-            <tr>    
-                <td style="text-align: center;">${tarea.id}</td>
-                <td style="text-align: left;">${tarea.task}</td>
-                <td style="text-align: center;"><input onchange="functOkTask(${tarea.id});" type="checkbox" id="chk-okey" name="opcion" value=""></td>
-                <td style="text-align: center;"><button onclick="functDelTask(${tarea.id});" class="material-symbols-outlined" style="color: red;">delete</button></td>
-            </tr>  
-        </tbody>
-        `;
-
-        if (`${tarea.estado}` === true) {
+            <tr>       
+            `;
+        if (`${tarea.estado}` === "true") {
             okTareas += 1;
-            alert(okTareas);
+            tabla +=
+                `<td style="text-align: center; text-decoration: line-through; color: green;">${tarea.id}</td>
+                        <td style="text-align: left; text-decoration: line-through; color: green;">${tarea.task}</td>
+                        <td style="text-align: center;"><input onchange="functUpdateTask(${tarea.id});" type="checkbox" id="chk-okey" name="opcion" value="" checked></td>
+                        `;
+
+        } else if (`${tarea.estado}` === "false") {
+            tabla +=
+                `<td style="text-align: center;">${tarea.id}</td>
+                        <td style="text-align: left;">${tarea.task}</td>
+                        <td style="text-align: center;"><input onchange="functUpdateTask(${tarea.id});" type="checkbox" id="chk-okey" name="opcion" value=""></td>
+                        `;
         }
+        tabla +=
+            `<td style="text-align: center;"><button onclick="functDelTask(${tarea.id});" class="material-symbols-outlined" style="color: red;">delete</button></td>
+            </tr >
+        </tbody >
+        `;
     }
     listaTareas.innerHTML = tabla;
-    taskTotales.innerHTML = `${tareas.length}`;
-
-    //alert("tareas listas... " + Number(okTareas));
-
+    taskTotales.innerHTML = `${tareas.length} `;
     taskRealizadas.innerHTML = Number(okTareas);
-
-
-    //console.log(tabla);
-    //console.log(tareas.length);
 }
 
+
+/*****************************************************************
+ * 
+ * FUNCION QUE AGREGA UNA TAREA A LA LISTA DE TAREAS
+ * 
+ ****************************************************************/
 function functAddTask() {
     const agregaTarea = document.getElementById("txt-tarea");
-
     let ultimo = "";
-
-    for (const ultimoId of tareas) {
-        ultimo = `${ultimoId.id}`;
+    for (const ultimoId of tareas) {  // CICLO PARA OBTENER EL VALOR DEL ULTIMO ID.
+        ultimo = `${ultimoId.id} `;
     }
-
-    ultimo = Number(ultimo) + 1;
-
-    //alert("el ultimo id es " + ultimo);
+    ultimo = Number(ultimo) + 1; // EL ULTIMO ID OBTENIDO, LE SUMAMOS 1.
 
     const nuevoObjetoTarea = {
-        id: ultimo,
+        id: ultimo,             // EL ULTIMO MÁS 1, SE GUARDA EN EL OBJETO, COMO ID CORRELATIVO DE LA NUEVA TAREA AGREGADA.
         task: agregaTarea.value,
         estado: false
     }
     tareas.push(nuevoObjetoTarea);
-
     agregaTarea.value = "";
-
     llenaTabla();
 }
 
+
+/*****************************************************************
+ * 
+ * FUNCION QUE ELIMIA LA TAREA REGISTRADA
+ * 
+ ****************************************************************/
 function functDelTask(key) {
+    const pos = tareas.findIndex((tarea) => tarea.id === key);
+    tareas.splice(pos, 1);
+    llenaTabla();
+}
 
-    //alert("tarea eliminada..." + key);
 
+/*****************************************************************
+ * 
+ * FUNCION QUE ACTUALIZA EL ESTADO DE LA TAREA REGISTRADA
+ * 
+ ****************************************************************/
+function functUpdateTask(key) {
     const pos = tareas.findIndex((tarea) => tarea.id === key);
 
-    //alert("posicion es... " + pos);
+    let estadoChk = tareas[pos].estado;
 
-    tareas.splice(pos, 1);
-
-    llenaTabla();
-
-}
-
-function functOkTask(dato) {
-
-    alert("tarea terminada " + dato);
-
-    for (const tarea of tareas) {
-
-        if (`${tarea.estado}` === true) {
-            okTareas += 1;
-        }
+    if (estadoChk === false) {
+        tareas[pos].estado = true;
+    } else if (estadoChk === true) {
+        tareas[pos].estado = false;
     }
 
-    const pos = tareas.findIndex((tarea) => tarea.id === key);
-
-    //alert("posicion es... " + pos);
-
-    tareas.splice(pos, 1);
+    //alert("actualizando estado... " + tareas[pos].estado);
 
     llenaTabla();
 }
-
 
 llenaTabla();
